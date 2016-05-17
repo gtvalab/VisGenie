@@ -1,0 +1,88 @@
+<html>
+<head>
+	<title></title>	
+	<script src="../src/d3.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../src/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+	Attribute 1: <select id='attr-1' class='axisselector'></select>
+	Attribute 2: <select id='attr-2' class='axisselector'></select>
+	Attribute 3: <select id='attr-3' class='axisselector'></select>
+	<button id="getRecommendationsButton">Get recommendations</button>
+	<br>
+	<br>
+	<br>
+	<div id='responseDiv'></div>
+</body>
+<script type="text/javascript" src='../src/DataProcessor.js'></script>
+<script type="text/javascript" src='../src/VisObject.js'></script>
+<script type="text/javascript" src='../src/VisGenie.js'></script>
+<script type="text/javascript">
+	var dataFile = "../test/data/cars.csv";
+ 	dataProcessor.processFile(dataFile);
+ 	setTimeout(function(){
+ 		// console.log(dataProcessor.getAttributeMap)
+ 		visGenie.generateRecommendationMap(dataProcessor.getAttributeMap());
+ 	},100);
+ 	d3.csv(dataFile,function(data){
+	 	$('.axisselector').find('option').remove().end();
+	    $(".axisselector").append($("<option></option>").val('').html(''));
+	    $("#encoding-attribute-dropdown").append($("<option></option>").val('').html(''));
+	    var dataAttributes = Object.keys(data[0]);
+	    for(var i in dataAttributes){
+	        var dataAttribute = dataAttributes[i];
+	        $(".axisselector").append($("<option></option>").val(dataAttribute).html(dataAttribute));        
+	    }
+	});
+
+	$("#getRecommendationsButton").click(function(){
+		var attr1 = $("#attr-1").val();
+		var attr2 = $("#attr-2").val();
+		var attr3 = $("#attr-3").val();
+		var attributes = [];
+		if(attr1!=""){
+			attributes.push(attr1);
+		}
+		if(attr2!=""){
+			attributes.push(attr2);
+		}
+		if(attr3!=""){
+			attributes.push(attr3);
+		}
+		var recoList = visGenie.getRecommendations(attributes);
+		
+		var visObjectAttributeList = ["chartType","xAttr","yAttr","xTransform","yTransform","colorAttr","sizeAttr","xFacetAttr","yFacetAttr","attributeCount","score"];
+
+		$("#responseDiv").html("");
+		var tableStr = "";
+		// $("#responseDiv").append("<table border='1' style='width:100%'>");
+		tableStr += "<table border='1' style='width:100%'>";
+		// $("#responseDiv").append("<tr>");
+		tableStr += "<tr>"
+		for(var i in visObjectAttributeList){
+			var attr = visObjectAttributeList[i];
+			// $("#responseDiv").append("<td><b>"+attr+"<b></td>");
+			tableStr += "<td><b>"+attr+"<b></td>";
+		}
+		// $("#responseDiv").append("</tr>");
+		for(var i in recoList){
+			// $("#responseDiv").append("<tr>");
+			tableStr += "<tr>"
+			var visObject = recoList[i];
+			for(var j in visObjectAttributeList){
+				var attr = visObjectAttributeList[j];
+				// $("#responseDiv").append("<td>"+visObject[attr]+"</td>");
+				tableStr += "<td>"+visObject[attr]+"</td>";
+				// console.log(attr,visObject[attr])
+			}
+			// $("#responseDiv").append("</tr>");
+			tableStr += "</tr>";
+		}
+		// $("#responseDiv").append("</table>");
+		tableStr += "</table>";
+
+		$("#responseDiv").append(tableStr);
+	});
+
+</script>
+</html>
