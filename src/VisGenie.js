@@ -422,7 +422,13 @@
 			setXYAttributes(attributes[0],attributes[0],barChartObject);
 			
 			barChartObject.setYTransform("COUNT");
-			barChartObjects.push(barChartObject);
+
+			for(var i=1;i<3;i++){
+				if(i==2){
+					barChartObject.setColorAttr(barChartObject.xAttr);
+				}
+				barChartObjects.push(barChartObject);
+			}
 		}
 
 		return barChartObjects;
