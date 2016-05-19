@@ -359,7 +359,6 @@
 				
 				var possibleYTransforms = [""];
 
-
 				// if(dataAggregationVariationIndex>0){
 					possibleYTransforms = getPossibleTransformsBasedOnAttribute(attributes[1]);
 				// }
@@ -380,6 +379,7 @@
 						}
 						barChartObjects.push(barChartObject);
 					}
+
 				}
 
 				// dataAggregationVariationIndex += 1;
