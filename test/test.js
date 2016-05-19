@@ -1,7 +1,7 @@
 (function(){
 
 	var dataFilePath = "data/test.csv";
-	
+
 	dataProcessor.processFile(dataFilePath);
 	
 	setTimeout(function () {

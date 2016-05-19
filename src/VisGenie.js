@@ -2,6 +2,7 @@
 	visGenie = {};
 
 	var chartTypes = ["Bar","Scatter","Line","Pie","Histogram","Distribution"];
+	//var chartTypes = ["Scatter"];
 
 	var datasetAttributeMap = {};
 
@@ -20,6 +21,8 @@
 
 	visGenie.generateRecommendationMap = function(attributeMap,attributesToSkip){
 
+		//console.log(getPermutations(["Retail Price","Dealer Cost","Type"]))
+
 		attributesToSkip = typeof attributesToSkip !== 'undefined' ? attributesToSkip : [];
 
 		var attributesToConsider = [];
@@ -37,27 +40,23 @@
 			}
 		}
 
-		console.log(datasetAttributeMap);
 
 		for(var k=1;k<=3;k++){
 			var attributeCombinations = getCombinations(attributesToConsider,k);
 			for(var attributeCombinationIndex in attributeCombinations){
 				var attributeCombination = attributeCombinations[attributeCombinationIndex].sort();
 
-				var attributePermutation = getPermutations(attributeCombination);
+				var attributePermutations = getPermutations(attributeCombination);
 
 				var visObjectsForAttributeCombination = [];
 
-				for(var attributePermutationIndex in attributePermutation){
+				for(var attributePermutationIndex in attributePermutations){
 
-					var attributes = attributePermutation[attributePermutationIndex];
+					var attributes = attributePermutations[attributePermutationIndex];
+
 					for(var chartTypeIndex in chartTypes){
 						var chartType = chartTypes[chartTypeIndex];
 						var visObjects = generateVisObjects(attributes,chartType);
-
-						//if(attributes.length==1 && attributes.indexOf("Type")!=-1 && chartType=="Bar"){
-						//	console.log(attributes,visObjects);
-						//}
 
 						for(var visObjectIndex in visObjects){
 							var visObject = visObjects[visObjectIndex];
@@ -65,13 +64,24 @@
 							//	console.log(visObject,visObjectsForAttributeCombination);
 							//	console.log(visGenie.isRepeatedVisObject(visObject,visObjectsForAttributeCombination));
 							//}
+
+							//if(visObject.xAttr=="Type" && visObject.yAttr=="Retail Price" && visObject.attributeCount==3 && visObject.xFacetAttr!=""){
+							//	console.log(visObject)
+							//}
+
+							//if(attributes[2]=="Dealer Cost" && visObject.attributeCount==3){
+							//	console.log(visGenie.isRepeatedVisObject(visObject,visObjectsForAttributeCombination,1))
+							//}
 							if(visGenie.isRepeatedVisObject(visObject,visObjectsForAttributeCombination)==-1 && isValidVisObject(visObject)==1){
+								scoreVisObject(visObject);
 								visObjectsForAttributeCombination.push(visObject);
 							}
 						}
 					}
 
 				}
+
+				sortObjectList(visObjectsForAttributeCombination,'score','d');
 
 				recommendationMap[attributeCombination.join(",")] = visObjectsForAttributeCombination;
 			}
@@ -107,7 +117,7 @@
 	}
 
 	function generateVisObjects(attributes,chartType){
-		var visObjects;
+		var visObjects = [];
 		switch(chartType){
 			case "Histogram":
 				if(attributes.length==1){
@@ -385,6 +395,11 @@
 			// }
 		}
 
+		//if(attributes[2]=="Dealer Cost"){
+		//	console.log(scatterplotObjects)
+		//}
+
+
 		return scatterplotObjects;
 
 	}
@@ -546,23 +561,31 @@
 		return pieChartObjects;
 	}
 
-	visGenie.isRepeatedVisObject = function(newVisObject,visObjects){
-		for(var i in visObjects){
+	visGenie.isRepeatedVisObject = function(newVisObject,visObjects,print){
+
+			for(var i in visObjects){
 			var visObject = visObjects[i];
-			if(visObject["chartType"]==newVisObject["chartType"]){
-				if(visObject['xAttr']==newVisObject['xAttr'] && visObject['yAttr']==newVisObject['yAttr'] && visObject['xTransform']==newVisObject['xTransform'] && visObject['yTransform']==newVisObject['yTransform'] && visObject['colorAttr']==newVisObject['colorAttr']){
+			if(visObject["chartType"]==newVisObject["chartType"] && visObject.attributeCount==newVisObject.attributeCount){
+				if(visObject['xAttr']==newVisObject['xAttr'] && visObject['yAttr']==newVisObject['yAttr'] && visObject['xTransform']==newVisObject['xTransform'] && visObject['yTransform']==newVisObject['yTransform'] && visObject['colorAttr']==newVisObject['colorAttr'] && visObject['xFacetAttr']==newVisObject['xFacetAttr'] && visObject['yFacetAttr']==newVisObject['yFacetAttr']){
+					//if(print==1){
+					//	console.log(newVisObject,visObject)
+					//}
 					return 1;
 				} else if(visObject['chartType']=="Bar"){
-					if(visObject['xAttr']==newVisObject['yAttr'] && visObject['yAttr']==newVisObject['xAttr'] && visObject['xTransform']==newVisObject['yTransform'] && visObject['yTransform']==newVisObject['xTransform'] && visObject['colorAttr']==newVisObject['colorAttr']){
+					if(visObject['xAttr']==newVisObject['yAttr'] && visObject['yAttr']==newVisObject['xAttr'] && visObject['xTransform']==newVisObject['yTransform'] && visObject['yTransform']==newVisObject['xTransform'] && visObject['colorAttr']==newVisObject['colorAttr'] && visObject['xFacetAttr']==newVisObject['yFacetAttr'] && visObject['yFacetAttr']==newVisObject['xFacetAttr']){
 						return 1;
 					}
 				} else {
-					if(visObject['xAttr']==newVisObject['yAttr']){
+					//if(print==1){
+					//	console.log(newVisObject,visObject)
+					//}
+					if(visObject['xAttr']==newVisObject['yAttr'] && visObject['yAttr']==newVisObject['xAttr']){
 						return 1;
 					}
 				}
 			}
 		}
+
 		return -1;
 	};
 
@@ -740,6 +763,15 @@
 		return -1;
 	}
 
+	function isCategorical(attribute){
+		if(attribute!="" && (attribute in datasetAttributeMap)){
+			if(datasetAttributeMap[attribute]['isCategorical']=='1'){
+				return 1;
+			}
+		}
+		return -1;
+	}
+
 	function isOnlyNumeric(attribute){
 		if(attribute!="" && (attribute in datasetAttributeMap)){
 			if(datasetAttributeMap[attribute]['isCategorical']=='0' && datasetAttributeMap[attribute]['isNumeric']=='1'){
@@ -762,6 +794,8 @@
 		}
 		return -1;
 	}
+
+
 
 	function swap(a,b){
 		var tmp;
@@ -802,6 +836,191 @@
 		throw new Error("Unable to copy obj! Its type isn't supported.");
 	}
 
+	function scoreVisObject(visObject){
+		var chartType = visObject.chartType;
+		switch (chartType){
+			case "Histogram":
+				scoreHistogram(visObject);
+				break;
+			case "Distribution":
+				scoreDistributionChart(visObject);
+				break;
+			case "Scatter":
+				scoreScatterplot(visObject);
+				break;
+			case "Bar":
+				scoreBarChart(visObject);
+				break;
+			case "Line":
+				scoreLineChart(visObject);
+				break;
+			case "Pie":
+				scorePieChart(visObject);
+				break;
+			default:
+				break;
+		}
+	}
+
+	function scoreBarChart(visObject){
+
+		if(isCategorical(visObject.xAttr)==1){
+			visObject.score += 1;
+		}
+
+		if(isOnlyNumeric(visObject.yAttr) && visObject.yTransform!=""){
+			visObject.score += 1;
+		}else if(isCategorical(visObject.yAttr) && visObject.yTransform=="COUNT"){ // single or two attribute chart with COUNT on Y-axis (prefer a pie chart to a bar chart)
+			visObject.score += 0.5;
+		}
+
+		var xAttrDomainLength = visObject.xAttr=="" ? 0 : datasetAttributeMap[visObject.xAttr]['domain'].length;
+		var xFacetAttrDomainLength = visObject.xFacetAttr=="" ? 0 : datasetAttributeMap[visObject.xFacetAttr]['domain'].length;
+		var yFacetAttrDomainLength = visObject.yFacetAttr=="" ? 0 : datasetAttributeMap[visObject.yFacetAttr]['domain'].length;
+		var colorAttrDomainLength = visObject.colorAttr=="" ? 0 : datasetAttributeMap[visObject.colorAttr]['domain'].length;
+
+		if(xAttrDomainLength>0 && xAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(xFacetAttrDomainLength>0 && xFacetAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(yFacetAttrDomainLength>0 && yFacetAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(colorAttrDomainLength>0 && colorAttrDomainLength<=12 && (visObject.colorAttr!=visObject.xAttr)){
+			visObject.score += 1;
+		}
+
+
+	}
+
+	function scorePieChart(visObject){
+
+		if(isCategorical(visObject.xAttr)==1){
+			visObject.score += 1;
+		}
+
+		if(isOnlyNumeric(visObject.yAttr) && visObject.yTransform!=""){
+			visObject.score += 1;
+		}else if(isCategorical(visObject.yAttr) && visObject.yTransform=="COUNT"){ // single or two attribute chart with COUNT on Y-axis (prefer a pie chart to a bar chart)
+			visObject.score += 1;
+		}
+
+		var xAttrDomainLength = visObject.xAttr=="" ? 0 : datasetAttributeMap[visObject.xAttr]['domain'].length;
+		var xFacetAttrDomainLength = visObject.xFacetAttr=="" ? 0 : datasetAttributeMap[visObject.xFacetAttr]['domain'].length;
+		var yFacetAttrDomainLength = visObject.yFacetAttr=="" ? 0 : datasetAttributeMap[visObject.yFacetAttr]['domain'].length;
+		var colorAttrDomainLength = visObject.colorAttr=="" ? 0 : datasetAttributeMap[visObject.colorAttr]['domain'].length;
+
+		if(xAttrDomainLength>0 && xAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(xFacetAttrDomainLength>0 && xFacetAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(yFacetAttrDomainLength>0 && yFacetAttrDomainLength<=12){
+			visObject.score += 1;
+		}
+
+		if(colorAttrDomainLength>0 && colorAttrDomainLength<=12 && (visObject.colorAttr!=visObject.xAttr)){
+			visObject.score += 1;
+		}
+
+	}
+
+	function scoreHistogram(visObject){
+
+		visObject.score = 1;
+
+	}
+
+	function scoreDistributionChart(visObject){
+
+		visObject.score = 1;
+
+	}
+
+	function scoreScatterplot(visObject){
+
+		if(isOnlyNumeric(visObject.xAttr)==1 && isOnlyNumeric(visObject.yAttr)==1){
+			visObject.score += 2;
+		}else if(isCategorical(visObject.xAttr)==1 && isOnlyNumeric(visObject.yAttr)==1){
+			visObject.score += 1;
+		}else if(isCategorical(visObject.xAttr)==1 && isCategorical(visObject.yAttr)==1){
+			visObject.score += 0.5;
+		}
+		//add a date check to increment score slightly (1)
+
+
+		//var colorAttrDomainLength = visObject.colorAttr=="" ? 0 : datasetAttributeMap[visObject.colorAttr]['domain'].length;
+		//var sizeAttrDomainLength = visObject.sizeAttr=="" ? 0 : datasetAttributeMap[visObject.colorAttr]['domain'].length;
+        //
+		//if(colorAttrDomainLength>0 && colorAttrDomainLength<=12){
+		//	visObject.score += 1;
+		//}
+        //
+		//if(sizeAttrDomainLength>0 && sizeAttrDomainLength<=12){
+		//	visObject.score += 1;
+		//}
+
+	}
+
+	function scoreLineChart(visObject){
+
+		if(isOnlyNumeric(visObject.xAttr)==1 && isOnlyNumeric(visObject.yAttr)==1){ // gets 2 for date + numeric
+			visObject.score += 1.5;
+		}else if(isCategorical(visObject.xAttr)==1 && isOnlyNumeric(visObject.yAttr)==1){
+			visObject.score += 1;
+		}else if(isCategorical(visObject.xAttr)==1 && isCategorical(visObject.yAttr)==1){
+			visObject.score += 0.5;
+		}
+
+	}
+
+	function sortObjectList(list, key,order) {
+		order = typeof order !== 'undefined' ? order : 'a';
+		function compare(a, b) {
+			a = a[key];
+			b = b[key];
+			var type = (typeof(a) === 'string' || typeof(b) === 'string') ? 'string' : 'number';
+			var result;
+			if (type === 'string'){
+				if(key=='startDate' || key=='endDate'){
+					a = new Date(a).getTime();
+					b = new Date(b).getTime();
+					if(order=='a'){
+						result = a - b;
+					}else if(order=='d'){
+						result = b - a;
+					}
+					//if(order=='a'){
+					//    result = a < b;
+					//}else if(order=='d'){
+					//    result = a > b;
+					//}
+				}else{
+					if(order=='a'){
+						result = a.localeCompare(b);
+					}else if(order=='d'){
+						result = b.localeCompare(a);
+					}
+				}
+			} else {
+				if(order=='a'){
+					result = a - b;
+				}else if(order=='d'){
+					result = b - a;
+				}
+			}
+			return result;
+		}
+		return list.sort(compare);
+	}
 
 	/*
 
