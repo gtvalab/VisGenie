@@ -470,7 +470,7 @@
 		for(var i in visObjects){
 			var visObject = visObjects[i];
 			if(visObject["chartType"]==newVisObject["chartType"]){
-				if(visObject['xAttr']==newVisObject['xAttr'] && visObject['yAttr']==newVisObject['yAttr'] && visObject['xTransform']==newVisObject['xTransform'] && visObject['yTransform']==newVisObject['yTransform']){
+				if(visObject['xAttr']==newVisObject['xAttr'] && visObject['yAttr']==newVisObject['yAttr'] && visObject['xTransform']==newVisObject['xTransform'] && visObject['yTransform']==newVisObject['yTransform'] && visObject['colorAttr']==newVisObject['colorAttr']){
 					return 1;
 				}else if(visObject['xAttr']==newVisObject['yAttr']){// && visObject['yAttr']==newVisObject['xAttr'] && visObject['xTransform']==newVisObject['xTransform'] && visObject['yTransform']==newVisObject['yTransform']){				
 					return 1;
