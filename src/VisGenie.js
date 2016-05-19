@@ -18,13 +18,29 @@
 		return recommendationMap[attributeCombination.join(",")];
 	};
 
-	visGenie.generateRecommendationMap = function(attributeMap){
+	visGenie.generateRecommendationMap = function(attributeMap,attributesToSkip){
 
+		attributesToSkip = typeof attributesToSkip !== 'undefined' ? attributesToSkip : [];
 
-		datasetAttributeMap = attributeMap;
+		var attributesToConsider = [];
+		if (attributesToSkip.length==0){
+			attributesToConsider = Object.keys(attributeMap);
+			datasetAttributeMap = attributeMap;
+		}else{
+			var allAttributes = Object.keys(attributeMap);
+			for(var i in allAttributes){
+				var attr = allAttributes[i];
+				if(attributesToSkip.indexOf(attr)==-1){
+					attributesToConsider.push(attr);
+					datasetAttributeMap[attr] = attributeMap[attr];
+				}
+			}
+		}
+
+		console.log(datasetAttributeMap);
 
 		for(var k=1;k<=3;k++){
-			var attributeCombinations = getCombinations(Object.keys(datasetAttributeMap),k);
+			var attributeCombinations = getCombinations(attributesToConsider,k);
 			for(var attributeCombinationIndex in attributeCombinations){
 				var attributeCombination = attributeCombinations[attributeCombinationIndex].sort();
 
@@ -475,7 +491,29 @@
 	function getPieChartVisObjects(attributes) {
 		var pieChartObjects = [];
 
-		if(attributes.length==2){
+		if(attributes.length==3){
+			var dataAggregationVariationIndex = 0;
+
+			var possibleYTransforms = [""];
+
+			possibleYTransforms = getPossibleTransformsBasedOnAttribute(attributes[1]);
+
+			for(var tmp in possibleYTransforms){
+				var pieChartObject = new VisObject("Pie");
+
+				setXYAttributes(attributes[0],attributes[1],pieChartObject);
+
+				pieChartObject.setXFacetAttr(attributes[2]);
+
+				pieChartObject.setYTransform(possibleYTransforms[tmp]);
+
+				pieChartObject.setColorAttr(pieChartObject.xAttr);
+
+				pieChartObjects.push(pieChartObject);
+
+			}
+
+		} else if(attributes.length==2){
 			var possibleYTransforms = [""];
 
 			possibleYTransforms = getPossibleTransformsBasedOnAttribute(attributes[1]);

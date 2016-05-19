@@ -46,14 +46,27 @@
         });
     };
 
-    dataProcessor.processList = function (data) {
+    dataProcessor.processList = function (data,attributesToSkip) {
+
+        attributesToSkip = typeof attributesToSkip !== 'undefined' ? attributesToSkip : [];
+
         dataProcessor.reset();
         for(var attribute in data[0]){
-            attributeMap[attribute] = {
-                'domain':[],
-                'isNumeric':'',
-                'isCategorical':''
-            };
+            if(attributesToSkip.length>0){
+                if(attributesToSkip.indexOf(attribute)==-1) {
+                    attributeMap[attribute] = {
+                        'domain': [],
+                        'isNumeric': '',
+                        'isCategorical': ''
+                    };
+                }
+            }else{
+                attributeMap[attribute] = {
+                    'domain': [],
+                    'isNumeric': '',
+                    'isCategorical': ''
+                };
+            }
         }
         for(var i in data){
             var d = data[i];
