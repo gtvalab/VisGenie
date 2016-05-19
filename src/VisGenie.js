@@ -20,7 +20,7 @@
 
 	visGenie.generateRecommendationMap = function(attributeMap){
 
-		console.log(getPermutations(["RP","DC"]))
+
 		datasetAttributeMap = attributeMap;
 
 		for(var k=1;k<=3;k++){
