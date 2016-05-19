@@ -67,30 +67,41 @@
 
     var updateAttributeScore = function(visObject){
         visObject.attributeCount = 0;
-        var attrs = ["xAttr","yAttr","xFacetAttr","yFacetAttr","sizeAttr","colorAttr"];
-        for(var i in attrs){
-            var attr = attrs[i];
-            if(visObject[attr]!="" && visObject[attr]!=undefined){
-                var increment = 1;
-                for(var j in attrs){
-                    if(i!=j){
-                        if(visObject[attrs[j]]==visObject[attr]){
-                            increment = 0;
-                            break;
-                        }
-                    }
-                }
-                if(increment==1){
-                    visObject.attributeCount += 1;
-                }
+        var visObjectAttrs = ["xAttr","yAttr","xFacetAttr","yFacetAttr","sizeAttr","colorAttr"];
+
+        var attributesInVisObject = [];
+        for(var i in visObjectAttrs ){
+            var visObjectAttr = visObjectAttrs[i];
+            if(attributesInVisObject.indexOf(visObject[visObjectAttr])==-1 && visObject[visObjectAttr]!=""){
+                attributesInVisObject.push(visObject[visObjectAttr]);
             }
         }
 
-        if(visObject["xAttr"]==visObject["yAttr"] && ((visObject["chartType"]=="Bar") || (visObject["chartType"]=="Pie"))){
-            if(visObject.attributeCount==0){
-                visObject.attributeCount = 1;
-            }
-        }
+        visObject.attributeCount = attributesInVisObject.length;
+
+        //for(var i in attrs){
+        //    var attr = attrs[i];
+        //    if(visObject[attr]!="" && visObject[attr]!=undefined){
+        //        var increment = 1;
+        //        for(var j in attrs){
+        //            if(i!=j){
+        //                if(visObject[attrs[j]]==visObject[attr]){
+        //                    increment = 0;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        if(increment==1){
+        //            visObject.attributeCount += 1;
+        //        }
+        //    }
+        //}
+        //
+        //if(visObject["xAttr"]==visObject["yAttr"] && ((visObject["chartType"]=="Bar") || (visObject["chartType"]=="Pie"))){
+        //    if(visObject.attributeCount==0){
+        //        visObject.attributeCount = 1;
+        //    }
+        //}
     }
 
 })();
