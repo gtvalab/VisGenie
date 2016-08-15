@@ -1,3 +1,6 @@
+/**
+ * Created by a.srinivasan on 7/19/16.
+ */
 (function(){
 
     VisObject = function(chartType){
@@ -5,6 +8,7 @@
         this.data = [];
         this.xAttr = "";
         this.yAttr = "";
+        this.tooltipLabelAttribute = "";
         this.colorAttr = "";
         this.sizeAttr = "";
         this.xFacetAttr = "";
@@ -13,9 +17,9 @@
         this.yTransform = "";
         this.score = 0.0;
         this.attributeCount = 0;
-    };
+    }
 
-    VisObject.prototype.setData = function(completeDataList) {
+    VisObject.prototype.setData = function(data) {
         this.data = data;
     };
 
@@ -27,6 +31,10 @@
     VisObject.prototype.setYAttr = function(attr) {
         this.yAttr = attr;
         updateAttributeScore(this);
+    };
+
+    VisObject.prototype.setLabelAttr = function(attr) {
+        this.tooltipLabelAttribute = attr;
     };
 
     VisObject.prototype.setColorAttr = function(attr) {
@@ -79,59 +87,29 @@
 
         visObject.attributeCount = attributesInVisObject.length;
 
-    };
-
-    function getHistogramData(xAttr,data) {
-
+        //for(var i in attrs){
+        //    var attr = attrs[i];
+        //    if(visObject[attr]!="" && visObject[attr]!=undefined){
+        //        var increment = 1;
+        //        for(var j in attrs){
+        //            if(i!=j){
+        //                if(visObject[attrs[j]]==visObject[attr]){
+        //                    increment = 0;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        if(increment==1){
+        //            visObject.attributeCount += 1;
+        //        }
+        //    }
+        //}
+        //
+        //if(visObject["xAttr"]==visObject["yAttr"] && ((visObject["chartType"]=="Bar") || (visObject["chartType"]=="Pie"))){
+        //    if(visObject.attributeCount==0){
+        //        visObject.attributeCount = 1;
+        //    }
+        //}
     }
 
-    function getBarChartData(xAttr,yAttr,xAttrTransform,yAttrTransform,colorAttr,facetAttr,data) {
-        var transformedList = [];
-        var labelValueMap = {};
-        for(var i in dataList){
-            //console.log(i, dataList[i], labelAttr, valueAttr);
-            var dataItem = dataList[i];
-            var labelAttrVal = dataItem[xAttr];
-            var valueAttrVal = dataItem[yAttr];
-
-            if(Object.keys(labelValueMap).indexOf(labelVal)==-1){ // encountering label for first time
-                labelValueMap[labelAttrVal] = {
-                    "valueSum":parseFloat(valueAttrVal),
-                    "count":1
-                };
-            }else{
-                labelValueMap[labelAttrVal]["valueSum"]+=parseFloat(valueAttrVal);
-                labelValueMap[labelAttrVal]["count"]+=1;
-            }
-        }
-
-        
-        if(yAttrTransform=="MEAN"){
-            for(var labelVal in labelValueMap){
-                transformedList.push({
-                    "xVal":labelVal,
-                    "yVal":parseFloat(labelValueMap[labelVal]['valueSum']/labelValueMap[labelVal]['count']),
-                    "colorVal":labelVal
-                });
-            }
-        }
-
-        return transformedList;
-    }
-
-    function getDistributionChartData(xAttr,yAttr,xAttrTransform,yAttrTransform,sizeAttr,colorAttr,facetAttr,data) {
-
-    }
-
-    function getPieChartData(xAttr,yAttr,xAttrTransform,yAttrTransform,sizeAttr,colorAttr,facetAttr,data) {
-
-    }
-
-    function getScatterplotData(xAttr,yAttr,xAttrTransform,yAttrTransform,sizeAttr,colorAttr,facetAttr,data) {
-
-    }
-
-    function getLineChartData(xAttr,yAttr,xAttrTransform,yAttrTransform,sizeAttr,colorAttr,facetAttr,data) {
-
-    }
 })();
