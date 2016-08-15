@@ -968,6 +968,18 @@
 		//	visObject.score += 1;
 		//}
 
+		if(isAggregationTransform(visObject.xTransform)==1 && isAggregationTransform(visObject.yTransform)==1){
+			visObject.score -= 1;
+		}
+
+	}
+
+	function isAggregationTransform(transform){
+		var aggregationTransforms = ["MEAN","MODE","COUNT","SUM"];
+		if(aggregationTransforms.indexOf(transform)!=-1){
+			return 1;
+		}
+		return -1;
 	}
 
 	function scoreLineChart(visObject){
@@ -978,6 +990,10 @@
 			visObject.score += 1;
 		}else if(isCategorical(visObject.xAttr)==1 && isCategorical(visObject.yAttr)==1){
 			visObject.score += 0.5;
+		}
+
+		if(isAggregationTransform(visObject.xTransform)==1 && isAggregationTransform(visObject.yTransform)==1){
+			visObject.score -= 1;
 		}
 
 	}
