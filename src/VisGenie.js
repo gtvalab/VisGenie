@@ -1,7 +1,7 @@
 (function(){
 	visGenie = {};
 
-	var chartTypes = ["Bar","Scatter","Line","Pie","Histogram","Distribution"];
+	var chartTypes = ["Bar","Scatterplot","Line","Pie","Histogram","Distribution"];
 	//var chartTypes = ["Scatter"];
 
 	var datasetAttributeMap = {};
@@ -129,7 +129,7 @@
 					visObjects = getDistributionChartVisObjects(attributes[0]);
 				}
 				break;
-			case "Scatter":
+			case "Scatterplot":
 				visObjects = getScatterplotVisObjects(attributes);
 				break;
 			case "Bar":
@@ -318,7 +318,7 @@
 
 				for(var tmp in possibleXTransforms){
 
-					var scatterplotObject = new VisObject("Scatter");
+					var scatterplotObject = new VisObject("Scatterplot");
 
 					var swapped = setXYAttributes(attributes[0],attributes[1],scatterplotObject);
 
@@ -382,7 +382,7 @@
 			// console.log(possibleXTransforms,possibleYTransforms)
 
 			for(var tmp in possibleXTransforms){
-				var scatterplotObject = new VisObject("Scatter");
+				var scatterplotObject = new VisObject("Scatterplot");
 
 				var swapped = setXYAttributes(attributes[0],attributes[1],scatterplotObject);
 
@@ -686,7 +686,7 @@
 					return -1;
 				}
 				break;
-			case "Scatter":
+			case "Scatterplot":
 				if(visObject.attributeCount<2){
 					return -1;
 				}else if(visObject.xFacetAttr!=""){
@@ -851,7 +851,7 @@
 			case "Distribution":
 				scoreDistributionChart(visObject);
 				break;
-			case "Scatter":
+			case "Scatterplot":
 				scoreScatterplot(visObject);
 				break;
 			case "Bar":
@@ -1043,159 +1043,5 @@
 		}
 		return list.sort(compare);
 	}
-
-	/*
-
-	 function isValidChart(attributes,chartType){
-	 switch(chartType){
-	 case "Scatter":
-	 if(attributes.length<2){
-	 return -1;
-	 }else{
-
-	 }
-	 break;
-	 case "Bar":
-	 if(attributes.length<2){
-	 return -1;
-	 }else{
-
-	 }
-	 break;
-	 case "Line":
-	 if(attributes.length<2){
-	 return -1;
-	 }else{
-
-	 }
-	 break;
-	 case "Pie":
-	 if(attributes.length<2){
-	 return -1;
-	 }else{
-
-	 }
-	 break;
-	 }
-	 return 1;
-	 }
-
-	 visGenie.getVisObjects = function (attributes,attributeMap,useAllCombinations) {
-
-	 useAllCombinations = typeof useAllCombinations !== 'undefined' ? useAllCombinations : 0;
-
-	 var attributeCount = attributes.length;
-	 var visObjects = [];
-	 datasetAttributeMap = attributeMap;
-
-	 switch(attributeCount){
-	 case 1:
-	 visObjects = singleAttribute(attributes[0]);
-	 break;
-	 case 2:
-	 case 3:
-	 case 4:
-	 if(useAllCombinations==1){
-	 visObjects = multipleAttributesAllCombinations(attributes);
-	 }else{
-	 visObjects = multipleAttributes(attributes);
-	 }
-	 break;
-	 default:
-	 console.log(">4 attributes. Currently unsupported feature!");
-	 }
-	 return visObjects;
-	 }
-
-	 function singleAttribute(attribute){
-	 var countSpecificCharts = ["Histogram","Distribution"];
-	 var visObjects = [];
-
-	 for(var i in countSpecificCharts){
-	 var chartType = countSpecificCharts[i];
-	 var visObject = generateVisObject([attribute],chartType)
-	 visObjects.push(visObject);
-	 }
-
-	 return visObjects;
-	 }
-
-	 function multipleAttributesAllCombinations(attributes){
-	 var countSpecificCharts = ["Scatter","Bar","Line","Pie"];
-	 var visObjects = [];
-
-	 var attributeCombinations = getCombinations(attributes);
-
-	 for(var i in attributeCombinations){
-	 var attributeCombination = attributeCombinations[i];
-	 for(var i in countSpecificCharts){
-	 var chartType = countSpecificCharts[i];
-	 if(attributeCombination.length==1){
-	 var visObject = generateVisObject([attribute],chartType)
-	 visObjects.push(visObject);
-	 }else{
-	 if(isValidChart(attributeCombination,chartType)==1){
-	 var visObject = generateVisObject(attributeCombination,chartType)
-	 visObjects.push(visObject);
-	 }
-	 }
-	 }
-	 }
-
-	 return visObjects;
-	 }
-
-	 function multipleAttributes(attributes){
-	 var countSpecificCharts = ["Scatter","Bar","Line","Pie"];
-	 var visObjects = [];
-
-	 for(var i in countSpecificCharts){
-	 var chartType = countSpecificCharts[i];
-	 console.log(isValidChart(attributes,chartType),chartType,attributes)
-	 if(isValidChart(attributes,chartType)==1){
-	 var visObject = generateVisObject(attributes,chartType)
-	 visObjects.push(visObject);
-	 }
-	 }
-
-	 return visObjects;
-	 }
-
-	 */
-
-	/*
-	 function getCombinations(set, min) {
-
-	 for(var i=0;i<set.length-1; i++){
-	 var item1 = set[i];
-	 for(var j = i+1; j<set.length;j++){
-	 var item2 = set[j];
-	 if(item1==item2){
-	 throw "getCombinations() takes a set of items (no duplicates)."
-	 }
-	 }
-	 }
-
-	 min = typeof min !== 'undefined' ? min : 1;
-
-	 var fn = function(n, src, got, all) {
-	 if (n == 0) {
-	 if (got.length > 0) {
-	 all[all.length] = got;
-	 }
-	 return;
-	 }
-	 for (var j = 0; j < src.length; j++) {
-	 fn(n - 1, src.slice(j + 1), got.concat([src[j]]), all);
-	 }
-	 return;
-	 }
-	 var all = [];
-	 for (var i = min; i < set.length; i++) {
-	 fn(i, set, [], all);
-	 }
-	 all.push(set);
-	 return all;
-	 }*/
 
 })();
