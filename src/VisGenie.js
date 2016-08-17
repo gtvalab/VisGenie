@@ -324,11 +324,17 @@
 
 
 					if(chartProperty=="colorAttr"){
-						scatterplotObject.setColorAttr(attributes[2]);
+						if(datasetAttributeMap[attributes[2]['isCategorical']]=='1'){
+							scatterplotObject.setColorAttr(attributes[2]);
+						}
 					}else if(chartProperty=="sizeAttr"){
-						scatterplotObject.setSizeAttr(attributes[2]);
+						if(datasetAttributeMap[attributes[2]['isCategorical']]=='1' && datasetAttributeMap[attributes[2]['isNumeric']]=='1') {
+							scatterplotObject.setSizeAttr(attributes[2]);
+						}
 					}else if(chartProperty=="xFacetAttr"){
-						scatterplotObject.setXFacetAttr(attributes[2]);
+						if(datasetAttributeMap[attributes[2]['isCategorical']]=='1') {
+							scatterplotObject.setXFacetAttr(attributes[2]);
+						}
 					}
 
 					if(swapped==1){
