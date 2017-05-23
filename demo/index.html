@@ -5,6 +5,13 @@
     <script type="text/javascript" src="../src/jquery-2.1.4.min.js"></script>
 </head>
 <body>
+	Dataset:
+	<select id="datasetSelector">
+		<option value="../test/data/cars.csv">Cars</option>
+		<option value="../test/data/sales.csv">Sales</option>
+		<option value="../test/data/colleges.csv">Universities</option>
+	</select>
+	<br>
 	Attribute 1: <select id='attr-1' class='axisselector'></select>
 	Attribute 2: <select id='attr-2' class='axisselector'></select>
 	Attribute 3: <select id='attr-3' class='axisselector'></select>
@@ -18,22 +25,35 @@
 <script type="text/javascript" src='../src/VisObject.js'></script>
 <script type="text/javascript" src='../src/VisGenie.js'></script>
 <script type="text/javascript">
-	var dataFile = "../test/data/cars.csv";
- 	dataProcessor.processFile(dataFile);
- 	setTimeout(function(){
- 		// console.log(dataProcessor.getAttributeMap)
- 		visGenie.generateRecommendationMap(dataProcessor.getAttributeMap());
- 	},100);
- 	d3.csv(dataFile,function(data){
-	 	$('.axisselector').find('option').remove().end();
-	    $(".axisselector").append($("<option></option>").val('').html(''));
-	    $("#encoding-attribute-dropdown").append($("<option></option>").val('').html(''));
-	    var dataAttributes = Object.keys(data[0]);
-	    for(var i in dataAttributes){
-	        var dataAttribute = dataAttributes[i];
-	        $(".axisselector").append($("<option></option>").val(dataAttribute).html(dataAttribute));        
-	    }
+	var df = "../test/data/cars.csv";
+	init(df);
+
+	$("#datasetSelector").change(function(evt){
+		$("#responseDiv").html("");
+		df = $("#datasetSelector").val();
+		console.log(df, 'here')
+		init(df);
 	});
+ 	
+	function init(dataFile){
+		dataProcessor.processFile(dataFile);
+		setTimeout(function(){
+			// console.log(dataProcessor.getAttributeMap)
+			visGenie.generateRecommendationMap(dataProcessor.getAttributeMap());
+		},100);
+
+		d3.csv(dataFile,function(data){
+			$('.axisselector').find('option').remove().end();
+			$(".axisselector").append($("<option></option>").val('').html(''));
+			$("#encoding-attribute-dropdown").append($("<option></option>").val('').html(''));
+			var dataAttributes = Object.keys(data[0]);
+			for(var i in dataAttributes){
+				var dataAttribute = dataAttributes[i];
+				$(".axisselector").append($("<option></option>").val(dataAttribute).html(dataAttribute));        
+			}
+		});
+	}
+
 
 	$("#getRecommendationsButton").click(function(){
 		var attr1 = $("#attr-1").val();
